@@ -28,6 +28,13 @@ async function run() {
 
     const tourSpotCollection = client.db("spotDB").collection("spot");
 
+
+    app.get('/spot', async(req, res) => {
+      const cursor = tourSpotCollection.find()
+      const allTouristSpots = await cursor.toArray();
+      res.send(allTouristSpots);
+    })
+
     app.post('/spot', async (req, res) => {
         const newTouristSpot = req.body;
         console.log(newTouristSpot);
@@ -48,7 +55,7 @@ run().catch(console.dir);
 
 
 app.get('/', (req, res) => {
-  res.send('CRUD SERVER RUNNING!');
+  res.send('TOURISM MANAGEMENT SERVER RUNNING!');
 });
 
 app.listen(port, (req, res) => {
