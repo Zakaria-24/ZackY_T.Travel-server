@@ -35,6 +35,20 @@ async function run() {
       res.send(allTouristSpots);
     })
 
+    app.get('/spot/:id', async(req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const touristSpot = await tourSpotCollection.findOne(query);
+      res.send(touristSpot);
+    })
+
+    app.get('/spot/:email', async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const result = await tourSpotCollection.find(query).toArray();
+      res.send(result);
+    })
+
     app.post('/spot', async (req, res) => {
         const newTouristSpot = req.body;
         console.log(newTouristSpot);
