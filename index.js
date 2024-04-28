@@ -48,7 +48,7 @@ async function run() {
     })
 
     // get for email 
-    app.get('/spot/:email', async (req, res) => {
+    app.get('/spots/:email', async (req, res) => {
       const email = req.params.email;
       const query = { email: email };
       const result = await tourSpotCollection.find(query).toArray();
@@ -60,6 +60,31 @@ async function run() {
         console.log(newTouristSpot);
         const result = await tourSpotCollection.insertOne(newTouristSpot);
         res.send(result);
+    })
+
+    app.put('/myList/:id', async (req, res) => {
+      const id = req.params.id;
+      const newMyList = req.body;
+      console.log(newMyList, id);
+
+      const filter = { _id: new ObjectId(id) };
+      const option = {upsert:true}
+      const updateMyList = {
+        $set: {
+            cost: newMyList.cost,
+            country: newMyList.country,
+            description: newMyList.description,
+            location: newMyList.location,
+            photoUrl: newMyList.photoUrl,
+            seasonality: newMyList.seasonality,
+            spotName: newMyList.spotName,
+            time: newMyList.time,
+            visit: newMyList.visit
+        }
+      }
+      const result = await tourSpotCollection.insertOne(newMyList);
+      res.send(result);
+
     })
 
     // Send a ping to confirm a successful connection
