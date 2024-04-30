@@ -31,6 +31,8 @@ async function run() {
     // await client.connect();
 
     const tourSpotCollection = client.db("spotDB").collection("spot");
+    const countriesCollection = client.db("spotDB").collection("countries");
+    const newsletterCollection = client.db("spotDB").collection("newsletter");
 
 
     app.get('/spot', async(req, res) => {
@@ -55,6 +57,23 @@ async function run() {
       res.send(result);
     })
 
+    // get for country
+    app.get('/countries', async (req, res) => {
+      const cursor = countriesCollection.find()
+      const result = await cursor.toArray();
+      res.send(result);
+    })
+
+    // get for mycountry Spots
+    app.get('/countries/:country', async (req, res) => {
+      const country = req.params.country;
+      const query = { country: country };
+      const cursor = tourSpotCollection.find(query)
+      const result = await cursor.toArray();
+      res.send(result);
+    })
+
+    // post
     app.post('/spot', async (req, res) => {
         const newTouristSpot = req.body;
         console.log(newTouristSpot);
@@ -62,13 +81,21 @@ async function run() {
         res.send(result);
     })
 
-    app.put('/myList/:id', async (req, res) => {
-      const id = req.params.id;
-      const newMyList = req.body;
-      console.log(newMyList, id);
+    // post for newsletter
+    app.post('/newsletter', async (req, res) => {
+      const newNewsletter = req.body;
+      console.log(newNewsletter);
+      const result = await newsletterCollection.insertOne(newNewsletter);
+      res.send(result);
+    })
 
+    app.put('/spot/:id', async (req, res) => {
+      const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
       const option = {upsert:true}
+      const newMyList = req.body;
+      // console.log(newMyList, id);
+
       const updateMyList = {
         $set: {
             cost: newMyList.cost,
@@ -82,10 +109,18 @@ async function run() {
             visit: newMyList.visit
         }
       }
-      const result = await tourSpotCollection.insertOne(newMyList);
+      const result = await tourSpotCollection.updateOne(filter, updateMyList, option);
+      console.log(result)
       res.send(result);
 
     })
+
+    app.delete('/spot/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await tourSpotCollection.deleteOne(query);
+      res.send(result);
+    });
 
     // Send a ping to confirm a successful connection
     // await client.db("admin").command({ ping: 1 });
